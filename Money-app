@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>💰 向錢衝</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#C3A995">
+  
+  <style>
+    ::-webkit-scrollbar { display: none; }
+    body { 
+      -ms-overflow-style: none; scrollbar-width: none; 
+      background-color: #FDFBF7; color: #5C4D42; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      -webkit-tap-highlight-color: transparent;
+    }
+    .pb-safe { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom)); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    input[type="date"] { -webkit-appearance: none; min-height: 3rem; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const THEME = { primary: '#C3A995', secondary: '#E3D5CA', bg: '#FDFBF7', textMain: '#5C4D42' };
+
+    // 佔位組件 (請將您原本的組件實作填入這裡)
+    const StoreManager = () => <div className="p-4">超商管理頁面</div>;
+    const MarketManager = () => <div className="p-4">市集管理頁面</div>;
+    const ReportDashboard = () => <div className="p-4">報表頁面</div>;
+    const ReserveManager = () => <div className="p-4">預留管理頁面</div>;
+
+    function App() {
+      const [activeTab, setActiveTab] = useState('store');
+      const [toastMsg, setToastMsg] = useState('');
+      const [showSettings, setShowSettings] = useState(false);
+      const [modalConfig, setModalConfig] = useState({ isOpen: false, title: '', message: '', confirmText: '確定', isDanger: false, showStoreSelect: false, onConfirm: null });
+      const [modalStoreType, setModalStoreType] = useState('7-11'); 
+
+      const showToast = (msg) => { setToastMsg(msg); setTimeout(() => setToastMsg(''), 3000); };
+      
+      const showModal = (config) => {
+        setModalStoreType('7-11');
+        setModalConfig({ ...config, isOpen: true });
+      };
+
+      return (
+        <div className="min-h-screen relative pb-safe">
+          {toastMsg && (
+            <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[100] animate-fade-in bg-gray-800 text-white px-5 py-3 rounded-full shadow-lg text-sm font-bold flex items-center gap-2 whitespace-nowrap">
+              {toastMsg}
+            </div>
+          )}
+
+          {modalConfig.isOpen && (
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[110] p-4 animate-fade-in">
+              <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl">
+                <h3 className="text-xl font-bold mb-3 text-[#5C4D42]">{modalConfig.title}</h3>
+                <p className="text-gray-600 mb-4">{modalConfig.message}</p>
+                <div className="flex gap-3 justify-end">
+                  <button onClick={() => setModalConfig(p => ({...p, isOpen: false}))} className="px-5 py-3 bg-gray-100 rounded-xl">取消</button>
+                  <button onClick={modalConfig.onConfirm} className="px-5 py-3 bg-[#C3A995] text-white rounded-xl">確定</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <header className="text-white shadow-md p-4 sticky top-0 z-50 bg-[#C3A995]">
+            <div className="max-w-4xl mx-auto flex justify-between items-center">
+              <h1 className="text-2xl font-bold">💰 向錢衝</h1>
+              <button onClick={() => setShowSettings(true)}>⚙️</button>
+            </div>
+          </header>
+
+          <main className="max-w-4xl mx-auto p-4">
+            {activeTab === 'store' && <StoreManager />}
+            {activeTab === 'market' && <MarketManager />}
+            {activeTab === 'reports' && <ReportDashboard />}
+            {activeTab === 'reserve' && <ReserveManager />}
+          </main>
+
+          <nav className="fixed bottom-0 left-0 right-0 bg-white border-t p-2 pb-safe flex justify-around z-[60]">
+            {[
+              { id: 'store', icon: '📦', label: '超商' },
+              { id: 'market', icon: '🛒', label: '市集' },
+              { id: 'reports', icon: '📊', label: '報表' },
+              { id: 'reserve', icon: '💎', label: '預留' }
+            ].map(tab => (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex flex-col items-center p-2 ${activeTab === tab.id ? 'text-[#C3A995]' : 'text-gray-400'}`}>
+                <span className="text-xl">{tab.icon}</span>
+                <span className="text-[10px] font-bold">{tab.label}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
